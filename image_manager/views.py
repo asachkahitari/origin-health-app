@@ -15,7 +15,7 @@ def dashboard(request):
 
     page = request.GET.get('page', 1)
 
-    paginator = Paginator(images, 1)
+    paginator = Paginator(images, 2)
 
     try:
         images = paginator.page(page)
@@ -70,7 +70,7 @@ def admin_dashboard(request):
 
     page = request.GET.get('page', 1)
 
-    paginator = Paginator(images, 1)
+    paginator = Paginator(images, 2)
 
     try:
         images = paginator.page(page)
@@ -78,7 +78,7 @@ def admin_dashboard(request):
         images = paginator.page(1)
     except EmptyPage:
         images = paginator.page(paginator.num_pages)
-        
+
     context = {
         'images': images,
         'upload_form': upload_form,
