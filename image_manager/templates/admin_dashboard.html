@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h2 {
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .image-container {
+            max-width: 300px;
+            margin: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        form {
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            transition: border-color 0.3s ease-in-out;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3498db;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        form, img {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.1);
+        }
+
+        .image-container:hover form {
+            transform: translateY(0);
+        }
+
+        .upload-form {
+            padding: 20px;
+            margin: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .logout-btn {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    
+        .step-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+        }
+    
+        .pagination-link {
+            padding: 8px 12px;
+            margin: 0 4px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease-in-out;
+        }
+    
+        .pagination-link:hover {
+            background-color: #2980b9;
+        }
+    
+        .current {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Admin Dashboard</h2>
+    <!-- Logout button -->
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+
+    <!-- Display existing images -->
+    {% for image in images %}
+        <div class="image-container">
+            <img src="{{ image.image.url }}" alt="{{ image.label }}">
+            <p>{{ image.label }}</p>
+
+            <!-- Edit form -->
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="image_id" value="{{ image.id }}">
+                <input type="text" name="new_label" placeholder="New Label" required>
+                <button type="submit" name="edit_image">Edit</button>
+            </form>
+
+            <!-- Delete form -->
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="image_id" value="{{ image.id }}">
+                <button type="submit" name="delete_image">Delete</button>
+            </form>
+        </div>
+    {% endfor %}
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if images.has_previous %}
+                <a href="?page=1" class="pagination-link">&laquo; first</a>
+                <a href="?page={{ images.previous_page_number }}" class="pagination-link">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ images.number }} of {{ images.paginator.num_pages }}.
+            </span>
+    
+            {% if images.has_next %}
+                <a href="?page={{ images.next_page_number }}" class="pagination-link">next</a>
+                <a href="?page={{ images.paginator.num_pages }}" class="pagination-link">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+    <!-- Image upload form -->
+    <form method="post" enctype="multipart/form-data" class="upload-form">
+        {% csrf_token %}
+        {{ upload_form.as_p }}
+        <button type="submit" name="upload_image">Upload Image</button>
+    </form>
+
+
+</body>
+</html>
